@@ -75,10 +75,13 @@ class LearningRegistry::Resource
     LearningRegistry::Config.hydra.queue(request)
   end
 
-  def self.slice(*args)
-    keywords = args.shift
+  def self.slice(options={})
+    attrs = options.select {|k,v| %(any_tags identity from until).include?(k.to_s) && v.present?}
+    keywords = attrs[:any_tags].split(" ").join(",")
+    attrs[:any_tags] = keywords
+    params = attrs.to_param
     request = Typhoeus::Request.new(LearningRegistry::Config.base_url +
-                                    "/slice?any_tags=#{keywords}",
+                                    "/slice?#{params}",
                                     { method: :get,
                                      timeout: LearningRegistry::Config.timeout }.merge(LearningRegistry::Config.headers))
 
@@ -92,7 +95,7 @@ class LearningRegistry::Resource
                           doc_type: document[:resource_data_description][:doc_type],
                   resource_locator: document[:resource_data_description][:resource_locator],
                   update_timestamp: document[:resource_data_description][:update_timestamp],
-                     resource_data: document[:resource_data_description][:resource_data],
+                     resource_data: LearningRegistry::ResourceData.initialize_from_xml_string(document[:resource_data_description][:resource_data]),
                               keys: document[:resource_data_description][:keys],
                                tos: document[:resource_data_description][:TOS],
                                rev: document[:resource_data_description][:rev],

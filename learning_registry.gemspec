@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.add_dependency(%q<typhoeus>, '~> 0.3.3')
   s.add_dependency(%q<yajl-ruby>, ">= 0")
   s.add_dependency(%q<activemodel>)
+  s.add_dependency(%q<nokogiri>)
 
   s.add_development_dependency('awesome_print')
   s.add_development_dependency('interactive_editor')

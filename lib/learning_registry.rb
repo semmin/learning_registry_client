@@ -5,10 +5,13 @@ module LearningRegistry
   require 'active_model'
   require 'typhoeus'
   require 'cgi'
+  require 'nokogiri'
+  require 'awesome_print'
 
   $LOAD_PATH.unshift(File.dirname(__FILE__))
 
   require "learning_registry/version"
   require "learning_registry/resource.rb"
+  require "learning_registry/resource_data.rb"
   require "learning_registry/config.rb"
 end
