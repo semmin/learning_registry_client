@@ -77,7 +77,7 @@ class LearningRegistry::Resource
 
   def self.slice(options={})
     attrs = options.select {|k,v| %(any_tags identity from until).include?(k.to_s) && v.present?}
-    keywords = "metadata," + attrs[:any_tags].split(" ").join(",")
+    keywords = attrs[:any_tags].split(" ").join(",")
     attrs[:any_tags] = keywords
     params = attrs.to_param
     request = Typhoeus::Request.new(LearningRegistry::Config.base_url +
@@ -86,10 +86,10 @@ class LearningRegistry::Resource
                                      timeout: LearningRegistry::Config.timeout }.merge(LearningRegistry::Config.headers))
 
     request.on_complete do |response|
+      resources = []
       if response.code == 200
         parsed = Yajl::Parser.parse(response.body, symbolize_keys: true)
         documents = parsed[:documents]
-        resources = []
         documents.each do |document|
           resources << new( doc_id: document[:doc_ID],
                           doc_type: document[:resource_data_description][:doc_type],
@@ -113,7 +113,7 @@ class LearningRegistry::Resource
         end
         yield resources, parsed[:resumption_token], parsed[:resultCount]
       else
-        return nil
+        yield resources, nil, 0
       end
     end
 
