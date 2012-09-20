@@ -77,9 +77,9 @@ class LearningRegistry::Resource
 
   def self.slice(options={})
     attrs = options.select {|k,v| %(any_tags identity from until).include?(k.to_s) && v.present?}
-    keywords = attrs[:any_tags].split(" ").join(",")
+    keywords = "metadata," + attrs[:any_tags].split(" ").join(",")
     attrs[:any_tags] = keywords
-    params = attrs.to_param
+    ap params = attrs.to_param
     request = Typhoeus::Request.new(LearningRegistry::Config.base_url +
                                     "/slice?#{params}",
                                     { method: :get,

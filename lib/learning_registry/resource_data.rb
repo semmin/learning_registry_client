@@ -49,15 +49,16 @@ class LearningRegistry::ResourceData
   def self.initialize_from_xml_string(xml)
     parsed = Nokogiri::XML(xml)
     if parsed.xml?
-      identifier = parsed.at("//dc:identifier").children.first.to_s if parsed.at("//dc:identifier")
-      title = parsed.at("//dc:title").children.first.to_s if parsed.at("//dc:title")
-      description = parsed.at("//dc:description").children.first.to_s if parsed.at("//dc:description")
-      language = parsed.at("//dc:language").children.first.to_s if parsed.at("//dc:language")
-      education_level = parsed.at("//dc:educationLevel").children.first.to_s if parsed.at("//dc:educationLevel")
-      audience = parsed.at("//dc:audience").children.first.to_s if parsed.at("//dc:audience")
-      subject = parsed.at("//dc:subject").children.first.to_s if parsed.at("//dc:subject")
-      publisher = parsed.at("//dc:publisher").children.first.to_s if parsed.at("//dc:publisher")
-      type = parsed.at("//dc:type").children.first.to_s if parsed.at("//dc:type")
+      parsed.remove_namespaces!
+      identifier = parsed.at("//identifier").children.first.to_s if parsed.at("//identifier")
+      title = parsed.at("//title").children.first.to_s if parsed.at("//title")
+      description = parsed.at("//description").children.first.to_s if parsed.at("//description")
+      language = parsed.at("//language").children.first.to_s if parsed.at("//language")
+      education_level = parsed.at("//educationLevel").children.first.to_s if parsed.at("//educationLevel")
+      audience = parsed.at("//audience").children.first.to_s if parsed.at("//audience")
+      subject = parsed.at("//subject").children.first.to_s if parsed.at("//subject")
+      publisher = parsed.at("//publisher").children.first.to_s if parsed.at("//publisher")
+      type = parsed.at("//type").children.first.to_s if parsed.at("//type")
     end
     new(identifier: identifier, title: title, description: description, language: language,
         education_level: education_level, audience: audience, subject: subject, type: type,
