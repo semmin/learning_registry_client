@@ -7,14 +7,24 @@ class LearningRegistry::Resource
   self.include_root_in_json = false
 
   ATTRIBUTES = [ :doc_id,
-                 :resource_data_description,
                  :doc_type,
                  :resource_locator,
-                 :resorce_data,
+                 :update_timestamp,
+                 :resource_data,
                  :keys,
                  :tos,
-                 :resource_data_type
-                  ]
+                 :rev,
+                 :resource_data_type,
+                 :payload_schema_locator,
+                 :payload_placement,
+                 :payload_schema,
+                 :node_timestamp,
+                 :digital_signature,
+                 :create_timestamp,
+                 :doc_version,
+                 :active,
+                 :publishing_node,
+                 :identity ]
 
   attr_accessor *ATTRIBUTES
 
@@ -46,8 +56,65 @@ class LearningRegistry::Resource
     false
   end
 
-  def self.slice
-    ap LearningRegistry::Config.base_url
+  def self.initialize_from_api(keywords)
+    request = Typhoeus::Request.new(LearningRegistry::Config.base_url +
+                                    "/slice?any_tags=#{keywords}",
+                                    { method: :get,
+                                     timeout: LearningRegistry::Config.timeout }.merge(LearningRegistry::Config.headers))
+
+    request.on_complete do |response|
+      if response.code == 200
+        parsed = Yajl::Parser.parse(response.body, symbolize_keys: true)
+        documents = parsed[:documents]
+        ap documents.first[:resource_data_description].keys
+      else
+        return nil
+      end
+    end
+
+    LearningRegistry::Config.hydra.queue(request)
+  end
+
+  def self.slice(*args)
+    keywords = args.shift
+    request = Typhoeus::Request.new(LearningRegistry::Config.base_url +
+                                    "/slice?any_tags=#{keywords}",
+                                    { method: :get,
+                                     timeout: LearningRegistry::Config.timeout }.merge(LearningRegistry::Config.headers))
+
+    request.on_complete do |response|
+      if response.code == 200
+        parsed = Yajl::Parser.parse(response.body, symbolize_keys: true)
+        documents = parsed[:documents]
+        resources = []
+        documents.each do |document|
+          resources << new( doc_id: document[:doc_ID],
+                          doc_type: document[:resource_data_description][:doc_type],
+                  resource_locator: document[:resource_data_description][:resource_locator],
+                  update_timestamp: document[:resource_data_description][:update_timestamp],
+                     resource_data: document[:resource_data_description][:resource_data],
+                              keys: document[:resource_data_description][:keys],
+                               tos: document[:resource_data_description][:TOS],
+                               rev: document[:resource_data_description][:rev],
+                resource_data_type: document[:resource_data_description][:resource_data_type],
+            payload_schema_locator: document[:resource_data_description][:payload_schema_locator],
+                 payload_placement: document[:resource_data_description][:payload_placement],
+                    payload_schema: document[:resource_data_description][:payload_schema],
+                    node_timestamp: document[:resource_data_description][:node_timestamp],
+                 digital_signature: document[:resource_data_description][:digital_signature],
+                  create_timestamp: document[:resource_data_description][:create_timestamp],
+                       doc_version: document[:resource_data_description][:doc_version],
+                            active: document[:resource_data_description][:active],
+                   publishing_node: document[:resource_data_description][:publishing_node],
+                          identity: document[:resource_data_description][:identity])
+        end
+        yield resources, parsed[:resumption_token], parsed[:resultCount]
+      else
+        return nil
+      end
+    end
+
+    LearningRegistry::Config.hydra.queue(request)
   end
 
 end
