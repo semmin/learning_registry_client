@@ -94,7 +94,7 @@ class LearningRegistry::Resource
           resources << new( doc_id: document[:doc_ID],
                           doc_type: document[:resource_data_description][:doc_type],
                   resource_locator: document[:resource_data_description][:resource_locator],
-                  update_timestamp: document[:resource_data_description][:update_timestamp],
+                  update_timestamp: self.pretty_date(document[:resource_data_description][:update_timestamp]),
                      resource_data: LearningRegistry::ResourceData.initialize_from_xml_string(document[:resource_data_description][:resource_data]),
                               keys: document[:resource_data_description][:keys],
                                tos: document[:resource_data_description][:TOS],
@@ -105,7 +105,7 @@ class LearningRegistry::Resource
                     payload_schema: document[:resource_data_description][:payload_schema],
                     node_timestamp: document[:resource_data_description][:node_timestamp],
                  digital_signature: document[:resource_data_description][:digital_signature],
-                  create_timestamp: document[:resource_data_description][:create_timestamp],
+                  create_timestamp: self.pretty_date(document[:resource_data_description][:create_timestamp]),
                        doc_version: document[:resource_data_description][:doc_version],
                             active: document[:resource_data_description][:active],
                    publishing_node: document[:resource_data_description][:publishing_node],
@@ -118,6 +118,13 @@ class LearningRegistry::Resource
     end
 
     LearningRegistry::Config.hydra.queue(request)
+  end
+
+  def self.pretty_date(timestamp)
+    if timestamp.blank?
+      timestamp = Date.today.xmlschema
+    end
+    Date.parse(timestamp.to_s).strftime('%b %d, %Y')
   end
 
 end
