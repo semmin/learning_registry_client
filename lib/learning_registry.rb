@@ -6,7 +6,6 @@ module LearningRegistry
   require 'typhoeus'
   require 'cgi'
   require 'nokogiri'
-  require 'awesome_print'
 
   $LOAD_PATH.unshift(File.dirname(__FILE__))
 
