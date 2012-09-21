@@ -77,8 +77,10 @@ class LearningRegistry::Resource
 
   def self.slice(options={})
     attrs = options.select {|k,v| %(any_tags identity from until).include?(k.to_s) && v.present?}
-    keywords = attrs[:any_tags].split(" ").join(",")
-    attrs[:any_tags] = keywords
+    if attrs[:any_tags].present?
+      keywords = attrs[:any_tags].to_s.split(" ").join(",")
+      attrs[:any_tags] = keywords
+    end
     params = attrs.to_param
     request = Typhoeus::Request.new(LearningRegistry::Config.base_url +
                                     "/slice?#{params}",
@@ -113,6 +115,7 @@ class LearningRegistry::Resource
         end
         yield resources, parsed[:resumption_token], parsed[:resultCount]
       else
+        puts "Non-success response code: #{response.code}"
         yield resources, nil, 0
       end
     end
