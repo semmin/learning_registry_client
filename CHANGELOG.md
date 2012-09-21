@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.0.3
+
+** Make timestamps human readable
+
 ## Version 0.0.1
 
 ** Created initial files and configuration **
